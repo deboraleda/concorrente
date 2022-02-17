@@ -24,11 +24,11 @@ void *sleep_thread(void *t){
 
     sem_wait(&mutex);
     ended_threads_count++;
-    sem_post(&mutex);
     if(ended_threads_count == t_number){
         printf("Todas as threads filhas finalizaram, liberando thread-mãe\n");
         sem_post(&sem);
     }
+    sem_post(&mutex);
     pthread_exit(NULL);
 }
 
@@ -64,5 +64,6 @@ int main(int argc, char *argv[]){
 
     printf("Thread mãe - o valor de n foi: %d\n", n);
     sem_destroy(&sem);
+    sem_destroy(&mutex);
 
 }
