@@ -41,6 +41,8 @@ Exemplo de execução:
 
 ## Questão 3
 
+> OBS: o código foi implementado em uma máquina com macOS e por esse motivo o semáforo é inicializado com a função `sem_open`, o que pode gerar incompatibilidade se rodado em distribuições linux.
+
 Compile o código com o seguinte comando:
 
 ```shell
@@ -52,3 +54,7 @@ Em seguida, execute passando o valor de `n` como parâmetro:
 ```shell
 ./q3 <valor_de_n>
 ```
+
+Exemplo de execução:
+
+<img src="./img/q3.png" width="300"/>
