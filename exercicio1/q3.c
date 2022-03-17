@@ -4,15 +4,29 @@
 #include <pthread.h>
 #include <semaphore.h>
  
-pthread_barrier_t barrier;
 sem_t mutex;
- 
 int n;
-int *pointer_random_s;
+int *array_s;
+ 
+static sem_t b_mutex;
+static sem_t b_sem;
+int ended_threads;
  
 struct thread_params {
    int tid;
 };
+ 
+void barrier(){
+   sem_wait(&b_mutex);
+   ended_threads++;
+   if (ended_threads == n){
+       sem_post(&b_sem);
+   }
+   sem_post(&b_mutex);
+ 
+   sem_wait(&b_sem);
+   sem_post(&b_sem);
+}
  
 void *thread_func(void *t){
    struct thread_params *param = (struct thread_params*) t;
@@ -26,16 +40,18 @@ void *thread_func(void *t){
    printf("PHASE ONE: Thread %d DONE! With random_s = %d\n", tid, s);
  
    sem_wait(&mutex);
-   pointer_random_s[tid] = s;
+   array_s[tid] = s;
    sem_post(&mutex);
  
-   pthread_barrier_wait(&barrier);
+   barrier();
  
    //Phase 2
    int prev_id = (tid + n - 1) % n;
+ 
    sem_wait(&mutex);
-   int prev_s = pointer_random_s[prev_id];
+   int prev_s = array_s[prev_id];
    sem_post(&mutex);
+ 
    printf("PHASE TWO: Thread %d sleeping for %d seconds\n", tid, prev_s);
    sleep(prev_s);
    printf("PHASE TWO: Thread %d DONE\n", tid);
@@ -48,20 +64,22 @@ int main(int argc, char *argv[]){
    n = atoi(argv[1]);
  
    int random_s[n];
-   pointer_random_s = random_s;
+   array_s = random_s;
  
    pthread_t threads[n];
    struct thread_params params[n];
  
-   pthread_barrier_init(&barrier, NULL, n);
    sem_init(&mutex, 0, 1);
+   sem_init(&b_sem, 0, 0);
+   sem_init(&b_mutex, 0, 1);
  
    for (int i = 0; i < n; i++){
        params[i].tid = i;
        pthread_create(&threads[i], NULL, thread_func, (void *)&params[i]);
    }
  
-   pthread_barrier_destroy(&barrier);
    sem_destroy(&mutex);
+   sem_destroy(&b_mutex);
+   sem_destroy(&b_sem);
    pthread_exit(NULL);
 }
