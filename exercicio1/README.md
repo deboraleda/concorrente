@@ -1,5 +1,7 @@
 # Como executar
 
+> OBS: As implementações foram feitas e testadas em distribuições Linux. É possível que algumas funções das bibliotecas utilizadas apresentem incompatibilidade se executadas em um ambiente MacOS.
+
 ## Questão 2 - versão com join
 
 Compile o código com o seguinte comando:
@@ -20,9 +22,6 @@ Exemplo de execução:
 
 ## Questão 2 - versão com semáforo
 
-> OBS: o semáforo é inicializado usando a função `sem_init`, o que pode
-gerar incompatibilidade com macOS
-
 Compile o código com o seguinte comando:
 
 ```shell
@@ -41,8 +40,6 @@ Exemplo de execução:
 
 ## Questão 3
 
-> OBS: o código foi implementado em uma máquina com macOS e por esse motivo o semáforo é inicializado com a função `sem_open`, o que pode gerar incompatibilidade se rodado em distribuições linux.
-
 Compile o código com o seguinte comando:
 
 ```shell
@@ -57,4 +54,4 @@ Em seguida, execute passando o valor de `n` como parâmetro:
 
 Exemplo de execução:
 
-<img src="./img/q3.png" width="300"/>
+<img src="./img/q3.png" width="500"/>
