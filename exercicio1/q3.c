@@ -3,90 +3,65 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
-
-sem_t *mutex;
-sem_t *sem1;
-
-struct thread_param {
-  long t_id;
-  int random_s;
-  int prev_s;
+ 
+pthread_barrier_t barrier;
+sem_t mutex;
+ 
+int n;
+int *pointer_random_s;
+ 
+struct thread_params {
+   int tid;
 };
-
-int ended_threads_count = 0;
-int t_number = 0;
-
-void *phase_one(void *t){
-    struct thread_param *param = (struct thread_param*) t;
-    long id = (long)param->t_id;
-    int time_sleep = rand() % 5;
-    printf("PHASE ONE: Thread %ld sleeping for %d seconds\n", id, time_sleep);
-    sleep(time_sleep);
-    int s = rand() % 10;
-    param->random_s = s;
-    printf("PHASE ONE: Thread %ld DONE! With random_s = %d\n", id, s);
-
-    sem_wait(sem1);
-    ended_threads_count++;
-    if(ended_threads_count == t_number){
-        sem_post(mutex);
-    }
-    sem_post(sem1);
-
-    pthread_exit(NULL);
+ 
+void *thread_func(void *t){
+   struct thread_params *param = (struct thread_params*) t;
+   int tid = (int) param->tid;
+  
+   //Phase 1
+   int time_sleep = rand() % 5;
+   printf("PHASE ONE: Thread %d sleeping for %d seconds\n", tid, time_sleep);
+   sleep(time_sleep);
+   int s = rand() % 10;
+   printf("PHASE ONE: Thread %d DONE! With random_s = %d\n", tid, s);
+ 
+   sem_wait(&mutex);
+   pointer_random_s[tid] = s;
+   sem_post(&mutex);
+ 
+   pthread_barrier_wait(&barrier);
+ 
+   //Phase 2
+   int prev_id = (tid + n - 1) % n;
+   sem_wait(&mutex);
+   int prev_s = pointer_random_s[prev_id];
+   sem_post(&mutex);
+   printf("PHASE TWO: Thread %d sleeping for %d seconds\n", tid, prev_s);
+   sleep(prev_s);
+   printf("PHASE TWO: Thread %d DONE\n", tid);
+ 
+   pthread_exit(NULL);
 }
-
-void *phase_two(void *t){
-    struct thread_param *param = (struct thread_param*) t;
-    int time_sleep = (int)param->prev_s;
-    printf("PHASE TWO: Thread %ld with prev_s = %d\n", param->t_id, param->prev_s);
-    sleep(time_sleep);
-    printf("PHASE TWO: Thread %ld DONE!\n", param->t_id);
-
-    sem_wait(sem1);
-    ended_threads_count++;
-    if (ended_threads_count == t_number){
-        sem_post(mutex);
-    }
-    sem_post(sem1);
-
-    pthread_exit(NULL);
-}
-
+ 
 int main(int argc, char *argv[]){
-    srand(time(NULL));
-    int n = atoi(argv[1]);
-    t_number = n;
-
-    pthread_t threads[n];
-    struct thread_param params[n];
-
-    mutex = sem_open("/mutex", O_CREAT, 0644, 0);
-    sem1 = sem_open("/sem1", O_CREAT, 0644, 1);
-
-    printf("-----Phase One-----\n");
-
-    for (int i = 0; i < n; i++){
-        params[i].t_id = i;
-        pthread_create(&threads[i], NULL, phase_one, (void *)&params[i]);
-    }
-
-    sem_wait(mutex);
-
-    printf("-----Phase Two-----\n");
-
-    ended_threads_count = 0;
-
-    for (int i = 0; i < n; i++){
-        int prev_thread_id = (i + n - 1) % n;
-        int s = params[prev_thread_id].random_s;
-        params[i].prev_s = s;
-        pthread_create(&threads[i], NULL, phase_two, (void *)&params[i]);
-    }
-
-    sem_close(mutex);
-    sem_unlink("/mutex");
-    sem_close(sem1);
-    sem_unlink("/sem1");
-    pthread_exit(NULL);
+   srand(time(NULL));
+   n = atoi(argv[1]);
+ 
+   int random_s[n];
+   pointer_random_s = random_s;
+ 
+   pthread_t threads[n];
+   struct thread_params params[n];
+ 
+   pthread_barrier_init(&barrier, NULL, n);
+   sem_init(&mutex, 0, 1);
+ 
+   for (int i = 0; i < n; i++){
+       params[i].tid = i;
+       pthread_create(&threads[i], NULL, thread_func, (void *)&params[i]);
+   }
+ 
+   pthread_barrier_destroy(&barrier);
+   sem_destroy(&mutex);
+   pthread_exit(NULL);
 }
