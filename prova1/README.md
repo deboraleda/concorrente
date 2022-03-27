@@ -18,7 +18,7 @@ Em seguida, execute passando o valor de `n` como parâmetro:
 
 Exemplo de execução:
 
-<img src="./img/q2_join.png" width="500"/>
+<img src="../img/q2_join.png" width="500"/>
 
 ## Questão 2 - versão com semáforo
 
@@ -36,7 +36,7 @@ Em seguida, execute passando o valor de `n` como parâmetro:
 
 Exemplo de execução:
 
-<img src="./img/q2_sem.png" width="500"/>
+<img src="../img/q2_sem.png" width="500"/>
 
 ## Questão 3
 
@@ -54,4 +54,4 @@ Em seguida, execute passando o valor de `n` como parâmetro:
 
 Exemplo de execução:
 
-<img src="./img/q3.png" width="500"/>
+<img src="../img/q3.png" width="500"/>
