@@ -33,7 +33,6 @@ func readFile(ch chan string){
       b1 := make([]byte, 1)
       f.Read(b1)
       
-
       if (b1[0] % 2) == 0 {
          fmt.Println("File", file)
       }
