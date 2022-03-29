@@ -5,7 +5,7 @@ package main
 import (
    "os"
    "fmt"
-	"sync"
+   "sync"
    "path/filepath"
 )
 
@@ -15,11 +15,11 @@ var wg sync.WaitGroup
 func walkDir(dir string, ch chan string){
 
    filepath.Walk(dir, func(path string, info os.FileInfo, err error) error{
-		if !info.IsDir() {
+      if !info.IsDir() {
          ch <- path
-		}
+      }
       return nil
-	})
+   })
    
    close(ch)
 
@@ -39,7 +39,7 @@ func readFile(ch chan string){
       if (b1[0] % 2) == 0 {
          fmt.Println("File", file)
       }
-	}   
+   }   
 }
  
 
