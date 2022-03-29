@@ -13,7 +13,7 @@ var wg sync.WaitGroup
 
 
 func walkDir(dir string, ch chan string){
-
+   defer wg.Done()
    filepath.Walk(dir, func(path string, info os.FileInfo, err error) error{
       if !info.IsDir() {
          ch <- path
@@ -22,8 +22,6 @@ func walkDir(dir string, ch chan string){
    })
    
    close(ch)
-
-   wg.Done()
 }
 
 
