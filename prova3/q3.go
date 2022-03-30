@@ -36,6 +36,8 @@ func readFile(ch chan string){
       if (b1[0] % 2) == 0 {
          fmt.Println("File", file)
       }
+
+      f.Close()
    }   
 }
  
