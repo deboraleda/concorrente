@@ -52,4 +52,4 @@ Em seguida, execute passando o valor de `n` como parâmetro:
 
 Exemplo de execução usando o diretório do repositório `dirteste`:
 
-<img src="../img/p3q3.png" width="600"/>
+<img src="../img/p3q3.png" width="500"/>
